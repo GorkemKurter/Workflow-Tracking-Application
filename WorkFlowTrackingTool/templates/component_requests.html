@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page Template</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            margin: 0;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .sidebar p {
+            margin: 0 0 20px;
+        }
+        .sidebar h2 {
+            margin: 0 0 10px;
+        }
+        .sidebar a {
+            color: #ecf0f1;
+            text-decoration: none;
+            display: block;
+            padding: 10px 0;
+        }
+        .sidebar a:hover {
+            background-color: #34495e;
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .filter-container input[type="text"] {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .filter-container button {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .filter-container button:hover {
+            background-color: #0056b3;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .button-group button {
+            padding: 8px 15px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .button-group button.active {
+            background-color: #28a745;
+        }
+        .button-container h3 {
+            margin-bottom: 10px;
+        }
+        .table-container {
+            display: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        form button {
+            background: none;
+            border: none;
+            color: #ecf0f1;
+            cursor: pointer;
+            padding: 10px 0;
+            text-align: left;
+            width: 100%;
+            font-size: 18px;
+        }
+        form button:hover {
+            background-color: #34495e;
+        }
+        .add-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            background-color: #28a745;
+            color: white;
+            text-align: center;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-left: 0;
+        }
+        .add-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div>
+            <p>Hi, {{ user.username }}</p>
+            <h2>Dashboard</h2>
+            <a href="#" onclick="loadContent('componentRequests')">Component Requests</a>
+            <a href="#" onclick="loadContent('components')">Components</a>
+            <a href="#" onclick="loadContent('tasks')">Tasks</a>
+        </div>
+        <div>
+            <form action="{% url 'UserAuth:logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit">Logout</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="main-content" id="main-content">
+        <div id="componentRequests" class="table-container">
+            <h2>Component Requests</h2>
+            <div class="filter-container">
+                <input type="text" id="filterInput" placeholder="Search...">
+                <button type="button" onclick="clearFilter()">Clear Filter</button>
+            </div>
+            <div class="button-container">
+                <h3>Filter by LVD reports</h3>
+                <div class="button-group">
+                    <button type="button" id="filterTWasher" onclick="toggleFilter('T Washer')">T Washer</button>
+                    <button type="button" id="filterFWasher" onclick="toggleFilter('F Washer')">F Washer</button>
+                    <button type="button" id="filterTWasherDryer" onclick="toggleFilter('T Washer Dryer')">T Washer Dryer</button>
+                    <button type="button" id="filterFWasherDryer" onclick="toggleFilter('F Washer Dryer')">F Washer Dryer</button>
+                    <button type="button" id="filterNWasher" onclick="toggleFilter('N Washer')">N Washer</button>
+                </div>
+            </div>
+            <a href="{% url 'UserAuth:add_component_request' %}" class="add-button">Add Component</a>
+            <table id="componentTable">
+                <tr>
+                    <th>Part Name</th>
+                    <th>Requester</th>
+                    <th>Manufacturer</th>
+                    <th>Type/Model</th>
+                    <th>SAP Code</th>
+                    <th>T Washer</th>
+                    <th>F Washer</th>
+                    <th>T Washer Dryer</th>
+                    <th>F Washer Dryer</th>
+                    <th>N Washer</th>
+                    <th>Status</th>
+                </tr>
+                {% for request in component_requests %}
+                <tr>
+                    <td><a href="{% url 'UserAuth:edit_component_request' request.id %}">{{ request.R_Part_name }}</a></td>
+                    <td>{{ request.R_Requester }}</td>
+                    <td>{{ request.R_Manufacturer }}</td>
+                    <td>{{ request.R_Model }}</td>
+                    <td>{{ request.R_SAP_code }}</td>
+                    <td>{{ request.R_T_Washer_LVD }}</td>
+                    <td>{{ request.R_F_Washer_LVD }}</td>
+                    <td>{{ request.R_T_Washer_Dryer_LVD }}</td>
+                    <td>{{ request.R_F_Washer_Dryer_LVD }}</td>
+                    <td>{{ request.R_N_Washer_LVD }}</td>
+                    <td>{{ request.R_Status }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div id="components" class="table-container">
+            <h2>Components</h2>
+            <p>This is where the components information will be displayed.</p>
+        </div>
+        <div id="tasks" class="table-container">
+            <h2>Tasks</h2>
+            <p>This is where the tasks information will be displayed.</p>
+        </div>
+    </div>
+    
+    <script>
+        function loadContent(section) {
+            var sections = document.getElementsByClassName('table-container');
+            for (var i = 0; i < sections.length; i++) {
+                sections[i].style.display = 'none';
+            }
+            document.getElementById(section).style.display = 'block';
+        }
+    
+        function filterTable() {
+            var input, filter, table, tr, td, i, j;
+            input = document.getElementById("filterInput");
+            filter = input.value.toLowerCase();
+            table = document.getElementById("componentTable");
+            tr = table.getElementsByTagName("tr");
+    
+            for (i = 1; i < tr.length; i++) {
+                tr[i].style.display = "none";
+                td = tr[i].getElementsByTagName("td");
+                for (j = 0; j < td.length; j++) {
+                    if (td[j]) {
+                        if (td[j].innerHTML.toLowerCase().indexOf(filter) > -1) {
+                            tr[i].style.display = "";
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    
+        function clearFilter() {
+            document.getElementById("filterInput").value = "";
+            clearWasherFilters();
+            filterTable();
+        }
+    
+        function clearWasherFilters() {
+            var filterButtons = document.querySelectorAll('.button-group button');
+            filterButtons.forEach(function(button) {
+                button.classList.remove('active');
+            });
+            var rows = document.querySelectorAll("#componentTable tr");
+            rows.forEach(function(row) {
+                row.style.display = "";
+            });
+        }
+    
+        function toggleFilter(filterType) {
+            var buttonId = 'filter' + filterType.replace(/ /g, '');
+            var button = document.getElementById(buttonId);
+            if (button.classList.contains('active')) {
+                button.classList.remove('active');
+                clearWasherFilters();
+            } else {
+                clearWasherFilters();
+                button.classList.add('active');
+                filterWasher(filterType);
+            }
+        }
+    
+        function filterWasher(filterType) {
+            var table, tr, td, i;
+            table = document.getElementById("componentTable");
+            tr = table.getElementsByTagName("tr");
+    
+            for (i = 1; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td");
+                if (td) {
+                    var washerIndex = filterType === 'T Washer' ? 5 :
+                                      filterType === 'F Washer' ? 6 :
+                                      filterType === 'T Washer Dryer' ? 7 :
+                                      filterType === 'F Washer Dryer' ? 8 : 9;
+                    if (td[washerIndex] && td[washerIndex].innerHTML.toLowerCase() === 'true') {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    
+        document.getElementById("filterInput").addEventListener("keyup", filterTable);
+    
+        window.onload = function() {
+            loadContent('componentRequests');
+        }
+    </script>
+    
+    </body>
+    </html>
+        
