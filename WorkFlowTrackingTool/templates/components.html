@@ -142,8 +142,8 @@
         <div>
             <p>Hi, {{ user.username }}</p>
             <h2>Dashboard</h2>
-            <a href="#" onclick="loadContent('componentRequests')">Component Requests</a>
-            <a href="{% url 'UserAuth:component' %}">Components</a>
+            <a href="{% url 'UserAuth:component_requests' %}">Component Requests</a>
+            <a href="#" onclick="loadContent('components')">Components</a>
             <a href="#" onclick="loadContent('tasks')">Tasks</a>
         </div>
         <div>
@@ -152,11 +152,10 @@
                 <button type="submit">Logout</button>
             </form>
         </div>
-    </div>
-    
+    </div>    
     <div class="main-content" id="main-content">
-        <div id="componentRequests" class="table-container">
-            <h2>Component Requests</h2>
+        <div id="components" class="table-container">
+            <h2>Components</h2>
             <div class="filter-container">
                 <input type="text" id="filterInput" placeholder="Search...">
                 <button type="button" onclick="clearFilter()">Clear Filter</button>
@@ -171,11 +170,10 @@
                     <button type="button" id="filterNWasher" onclick="toggleFilter('N Washer')">N Washer</button>
                 </div>
             </div>
-            <a href="{% url 'UserAuth:add_component_request' %}" class="add-button">Add Component</a>
+            <a href="{% url 'UserAuth:add_component' %}" class="add-button">Add Component</a>
             <table id="componentTable">
                 <tr>
                     <th>Part Name</th>
-                    <th>Requester</th>
                     <th>Manufacturer</th>
                     <th>Type/Model</th>
                     <th>SAP Code</th>
@@ -184,27 +182,24 @@
                     <th>T Washer Dryer</th>
                     <th>F Washer Dryer</th>
                     <th>N Washer</th>
-                    <th>Created Date</th>
                     <th>Last Update</th>
-                    <th>Priority</th>
-                    <th>Status</th>
+                    <th>Certificate Expiry Date</th>
+                    <th>Test Results</th>
                 </tr>
-                {% for request in component_requests %}
+                {% for request in components %}
                 <tr>
-                    <td><a href="{% url 'UserAuth:edit_component_request' request.id %}">{{ request.R_Part_name }}</a></td>
-                    <td>{{ request.R_Requester }}</td>
-                    <td>{{ request.R_Manufacturer }}</td>
-                    <td>{{ request.R_Model }}</td>
-                    <td>{{ request.R_SAP_code }}</td>
-                    <td>{{ request.R_T_Washer_LVD }}</td>
-                    <td>{{ request.R_F_Washer_LVD }}</td>
-                    <td>{{ request.R_T_Washer_Dryer_LVD }}</td>
-                    <td>{{ request.R_F_Washer_Dryer_LVD }}</td>
-                    <td>{{ request.R_N_Washer_LVD }}</td>
-                    <td>{{ request.R_Created_Date }}</td>
-                    <td>{{ request.R_Last_Update_Date }}</td>
-                    <td>{{ request.R_Priority }}</td>
-                    <td>{{ request.R_Status }}</td>
+                    <td><a href="{% url 'UserAuth:edit_component' request.id %}">{{ request.Part_name }}</a></td>
+                    <td>{{ request.Manufacturer }}</td>
+                    <td>{{ request.Model }}</td>
+                    <td>{{ request.SAP_code }}</td>
+                    <td>{{ request.T_Washer_LVD }}</td>
+                    <td>{{ request.F_Washer_LVD }}</td>
+                    <td>{{ request.T_Washer_Dryer_LVD }}</td>
+                    <td>{{ request.F_Washer_Dryer_LVD }}</td>
+                    <td>{{ request.N_Washer_LVD }}</td>
+                    <td>{{ request.Last_Update_Date }}</td>
+                    <td>{{ request.Certificate_Expiry_Date }}</td>
+                    <td>{{ request.Test_Results_Link }}</td>
                 </tr>
                 {% endfor %}
             </table>
@@ -283,10 +278,10 @@
             for (i = 1; i < tr.length; i++) {
                 td = tr[i].getElementsByTagName("td");
                 if (td) {
-                    var washerIndex = filterType === 'T Washer' ? 5 :
-                                      filterType === 'F Washer' ? 6 :
-                                      filterType === 'T Washer Dryer' ? 7 :
-                                      filterType === 'F Washer Dryer' ? 8 : 9;
+                    var washerIndex = filterType === 'T Washer' ? 4 :
+                                      filterType === 'F Washer' ? 5 :
+                                      filterType === 'T Washer Dryer' ? 6 :
+                                      filterType === 'F Washer Dryer' ? 7 : 8;
                     if (td[washerIndex] && td[washerIndex].innerHTML.toLowerCase() === 'true') {
                         tr[i].style.display = "";
                     } else {
@@ -299,7 +294,7 @@
         document.getElementById("filterInput").addEventListener("keyup", filterTable);
     
         window.onload = function() {
-            loadContent('componentRequests');
+            loadContent('components');
         }
     </script>
     

@@ -81,7 +81,7 @@
         <p>Hi, {{ user.username }}</p>
         <h2>Dashboard</h2>
         <a href="{% url 'UserAuth:component_requests' %}">Component Requests</a>
-        <a href="#" onclick="showTable('components')">Components</a>
+        <a href="{% url 'UserAuth:component' %}">Components</a>
         <a href="#" onclick="showTable('tasks')">Tasks</a>
     </div>
     <div>

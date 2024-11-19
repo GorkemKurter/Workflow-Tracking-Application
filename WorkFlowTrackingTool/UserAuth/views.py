@@ -4,8 +4,10 @@ from django.contrib import messages
 from .forms import RegisterForm, LoginForm
 from django.contrib.auth import login as alogin,authenticate,logout as dlogout
 from django.contrib.auth.decorators import login_required
-from LVD_Management_System.models import Component_Request
-from LVD_Management_System.forms import Component_RequestAdminForm
+from LVD_Management_System.models import Component_Request,Component
+from LVD_Management_System.forms import Component_RequestAdminForm, ComponentAdminForm
+
+#Register/Login Part
 
 def register(request):
     form = RegisterForm(request.POST or None)
@@ -62,6 +64,8 @@ def main(request):
     
     return render(request,'main_page.html')
 
+#Component Request Part
+
 @login_required(login_url='UserAuth:login')
 def component_requests(request):
     component_requests = Component_Request.objects.all()
@@ -97,3 +101,53 @@ def add_component_request(request):
     else:
         form = Component_RequestAdminForm(initial={'R_Requester': request.user, 'R_Status': "Pending"})
     return render(request, 'add_component_request.html', {'form': form})
+
+@login_required
+def delete_component_request(request, id):
+    component_request = get_object_or_404(Component_Request, id=id)
+    if request.method == 'POST':
+        component_request.delete()
+        return redirect('UserAuth:component_requests')
+    return render(request, 'edit_component_request.html', {'form': Component_RequestAdminForm(instance=component_request)})
+
+#LVD Components Part
+
+@login_required
+def component(request):
+    component = Component.objects.all()
+    return render(request,'components.html',{'components':component})
+
+@login_required
+def edit_component(request, id):
+    component = get_object_or_404(Component, id=id)
+    if not request.user.is_superuser:
+        form = ComponentAdminForm(instance=component)
+        return render(request, 'view_components.html',{'form':form,})
+    if request.method == 'POST':
+        form = ComponentAdminForm(request.POST, instance=component)
+        if form.is_valid():
+            form.save()
+            return redirect('UserAuth:component')
+    else:
+        form = ComponentAdminForm(instance=component)
+    return render (request, 'edit_components.html', {'form': form, 'editable': True})
+        
+@login_required
+def add_component(request):
+    if request.method == 'POST':
+        form = ComponentAdminForm(request.POST)
+        if form.is_valid():
+            component = form.save(commit=False)
+            component.save()
+            return redirect('UserAuth:component')
+    else:
+        form = ComponentAdminForm()
+    return render(request, 'add_components.html', {'form': form})
+
+@login_required
+def delete_component(request, id):
+    component = get_object_or_404(Component, id=id)
+    if request.method == 'POST':
+        component.delete()
+        return redirect('UserAuth:component')
+    return render(request, 'components.html', {'form': ComponentAdminForm(instance=component)})

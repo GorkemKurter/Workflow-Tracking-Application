@@ -1,5 +1,5 @@
 from django import forms
-from .models import Component_Request
+from .models import Component_Request, Component
 from django.utils.html import format_html
 
 class Component_RequestAdminForm(forms.ModelForm):
@@ -13,3 +13,9 @@ class Component_RequestAdminForm(forms.ModelForm):
         self.fields['R_Part_name'].help_text = format_html(
             '<a href="/static/Test-Requirements.pdf"download>Download Guidebook</a>'
         )
+
+class ComponentAdminForm(forms.ModelForm):
+    
+    class Meta : 
+        model = Component
+        fields = '__all__'

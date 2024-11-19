@@ -55,7 +55,8 @@ class Component(models.Model):
     SAP_code = models.CharField(verbose_name="SAP Code",max_length=80)
     Certificate_Expiry_Date = models.DateField(verbose_name = 'Certificate Expiry Date')
     Test_Results_Link = models.CharField(verbose_name='Test Reports & Certificate Link',max_length=1000)
-    
+    Created_Date = models.DateField(auto_now_add=True,verbose_name='Created Date')
+    Last_Update_Date = models.DateField(auto_now=True,verbose_name='Last Update')
     def __str__(self):
         return self.Model
     
@@ -114,6 +115,10 @@ class Component_Request(models.Model):
     Pre_Series_Date = models.DateField(verbose_name = 'Date of Pre Series',help_text='Hint : Enter date in format YYYY-MM-DD')
     Test_Results_Link = models.CharField(verbose_name='Test Reports & Certificate Link',max_length=1000,
                                          help_text='Warning : Folder must be placed in the local network VBCARGE')
+    R_Created_Date = models.DateField(auto_now_add=True,verbose_name='Created Date')
+    R_Last_Update_Date = models.DateField(auto_now=True,verbose_name='Last Update')
+    R_Priority_Choices = [("High","High"),("Normal","Normal"),("Low","Low")]
+    R_Priority = models.CharField(verbose_name='Priority',choices=R_Priority_Choices,default='Normal',max_length=40)
     #R_Test_Results = models.FileField(upload_to='test_results/', verbose_name="Upload Test Results", null=True, blank=True)
 
     def __str__(self):
