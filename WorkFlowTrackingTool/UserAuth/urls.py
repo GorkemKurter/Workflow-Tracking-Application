@@ -15,4 +15,5 @@ urlpatterns = [
     path('component/edit/<int:id>/', views.edit_component, name='edit_component'),
     path('component/add/', views.add_component, name='add_component'),
     path('component/delete/<int:id>/', views.delete_component, name='delete_component'),
+    path('component/forbidden', views.forbidden, name='forbidden'),
 ]

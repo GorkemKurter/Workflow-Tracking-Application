@@ -126,7 +126,10 @@ def edit_component(request, id):
     if request.method == 'POST':
         form = ComponentAdminForm(request.POST, instance=component)
         if form.is_valid():
-            form.save()
+            component_request = form.save(commit=False)
+            if component_request.R_Status == "Approved":
+                save_component_from_request(component_request)
+                component_request.save()
             return redirect('UserAuth:component')
     else:
         form = ComponentAdminForm(instance=component)
@@ -134,15 +137,18 @@ def edit_component(request, id):
         
 @login_required
 def add_component(request):
-    if request.method == 'POST':
-        form = ComponentAdminForm(request.POST)
-        if form.is_valid():
-            component = form.save(commit=False)
-            component.save()
-            return redirect('UserAuth:component')
+    if request.user.is_superuser:
+        if request.method == 'POST':
+            form = ComponentAdminForm(request.POST)
+            if form.is_valid():
+                component = form.save(commit=False)
+                component.save()
+                return redirect('UserAuth:component')
+        else:
+            form = ComponentAdminForm()
+        return render(request, 'add_components.html', {'form': form})
     else:
-        form = ComponentAdminForm()
-    return render(request, 'add_components.html', {'form': form})
+        return redirect('UserAuth:forbidden')
 
 @login_required
 def delete_component(request, id):
@@ -151,3 +157,25 @@ def delete_component(request, id):
         component.delete()
         return redirect('UserAuth:component')
     return render(request, 'components.html', {'form': ComponentAdminForm(instance=component)})
+
+@login_required
+def forbidden(request):
+    return render(request, 'forbidden.html')
+
+def save_component_from_request(request):
+    Component.objects.create(
+        Part_name=request.R_Part_name,
+        Manufacturer=request.R_Manufacturer,
+        Model=request.R_Model,
+        Technical_Data=request.R_Technical_Data,
+        Standard=request.R_Standard,
+        Mark_of_Conformity=request.R_Mark_of_Conformity,
+        T_Washer_LVD=request.R_T_Washer_LVD,
+        T_Washer_Dryer_LVD=request.R_T_Washer_Dryer_LVD,
+        F_Washer_LVD=request.R_F_Washer_LVD,
+        F_Washer_Dryer_LVD=request.R_F_Washer_Dryer_LVD,
+        N_Washer_LVD=request.R_N_Washer_LVD,
+        SAP_code=request.R_SAP_code,
+        Certificate_Expiry_Date='1999-11-11',
+        Test_Results_Link=request.R_Test_Results_Link,
+    )

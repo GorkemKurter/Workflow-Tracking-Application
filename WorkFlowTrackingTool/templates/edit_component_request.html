@@ -28,7 +28,10 @@
             margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            {% if not editable %}readonly{% endif %}
+        }
+        input[readonly], select[readonly] {
+            background-color: #e9ecef;
+            pointer-events: none;
         }
         button[type="submit"], button[type="button"], button[type="reset"] {
             padding: 10px 20px;
@@ -78,6 +81,15 @@
             form.submit();
         }
     }
+
+    // Alanları read-only yapmak için kullanıcı admin mi kontrol et
+    document.addEventListener('DOMContentLoaded', function() {
+        var isAdmin = {{ user.is_superuser|yesno:"true,false" }};
+        if (!isAdmin) {
+            document.querySelector('[name="R_Requester"]').setAttribute('readonly', true);
+            document.querySelector('[name="R_Status"]').setAttribute('readonly', true);
+        }
+    });
 </script>
 
 </body>

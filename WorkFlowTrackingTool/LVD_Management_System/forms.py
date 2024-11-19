@@ -13,7 +13,6 @@ class Component_RequestAdminForm(forms.ModelForm):
         self.fields['R_Part_name'].help_text = format_html(
             '<a href="/static/Test-Requirements.pdf"download>Download Guidebook</a>'
         )
-
 class ComponentAdminForm(forms.ModelForm):
     
     class Meta : 
