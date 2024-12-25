@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 app_name = 'UserAuth'
 
 urlpatterns = [
@@ -16,4 +18,11 @@ urlpatterns = [
     path('component/add/', views.add_component, name='add_component'),
     path('component/delete/<int:id>/', views.delete_component, name='delete_component'),
     path('component/forbidden', views.forbidden, name='forbidden'),
+    path('component_requests/export_to_csv', views.cpRequest_export_csv, name='cpRequest_export_csv'),
+    path('component/export_to_csv', views.cp_export_csv, name='cp_export_csv'),
+    path('account/',views.account, name='accounts'),
+    path('account/add_account',views.add_account, name='add_accounts'),
+    path('account/edit_account/<int:id>/',views.edit_account, name='edit_accounts')
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

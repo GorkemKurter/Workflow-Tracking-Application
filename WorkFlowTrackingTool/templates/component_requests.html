@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Page Template</title>
+    <title>Main Page</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -121,20 +121,25 @@
         form button:hover {
             background-color: #34495e;
         }
-        .add-button {
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .add-button, .export-button {
             display: inline-block;
             padding: 10px 20px;
-            margin-bottom: 20px;
             background-color: #28a745;
             color: white;
             text-align: center;
-            border-radius: 4px;
+            border-radius: 400px;
             text-decoration: none;
-            margin-left: 0;
         }
-        .add-button:hover {
+        .add-button:hover, .export-button:hover {
             background-color: #218838;
         }
+
     </style>
 </head>
 <body>
@@ -145,6 +150,7 @@
             <a href="#" onclick="loadContent('componentRequests')">Component Requests</a>
             <a href="{% url 'UserAuth:component' %}">Components</a>
             <a href="#" onclick="loadContent('tasks')">Tasks</a>
+            <a href="{% url 'UserAuth:component' %}">Accounts</a>
         </div>
         <div>
             <form action="{% url 'UserAuth:logout' %}" method="post">
@@ -172,6 +178,7 @@
                 </div>
             </div>
             <a href="{% url 'UserAuth:add_component_request' %}" class="add-button">Add Component</a>
+            <a href="{% url 'UserAuth:cpRequest_export_csv' %}" class="export-button">Export to Excel</a>
             <table id="componentTable">
                 <tr>
                     <th>Part Name</th>
@@ -179,13 +186,22 @@
                     <th>Manufacturer</th>
                     <th>Type/Model</th>
                     <th>SAP Code</th>
+                    <th>Pre Series Date</th>
                     <th>T Washer</th>
                     <th>F Washer</th>
                     <th>T Washer Dryer</th>
                     <th>F Washer Dryer</th>
                     <th>N Washer</th>
-                    <th>Created Date</th>
-                    <th>Last Update</th>
+                    <th>
+                        <a href="?sort_by=R_Created_Date&order={% if current_sort_by == 'R_Created_Date' and current_order == 'asc' %}desc{% else %}asc{% endif %}">
+                            Created Date
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?sort_by=R_Last_Update_Date&order={% if current_sort_by == 'R_Last_Update_Date' and current_order == 'asc' %}desc{% else %}asc{% endif %}">
+                            Last Update
+                        </a>
+                    </th>
                     <th>Priority</th>
                     <th>Status</th>
                 </tr>
@@ -196,6 +212,7 @@
                     <td>{{ request.R_Manufacturer }}</td>
                     <td>{{ request.R_Model }}</td>
                     <td>{{ request.R_SAP_code }}</td>
+                    <td>{{ request.Pre_Series_Date }}</td>
                     <td>{{ request.R_T_Washer_LVD }}</td>
                     <td>{{ request.R_F_Washer_LVD }}</td>
                     <td>{{ request.R_T_Washer_Dryer_LVD }}</td>

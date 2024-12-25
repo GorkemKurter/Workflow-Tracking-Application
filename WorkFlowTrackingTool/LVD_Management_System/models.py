@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User, Group
+
 # Create your models here.
 class Component(models.Model):
     
@@ -39,7 +39,7 @@ class Component(models.Model):
              ("Varistor","Varistor"),("XY Capacitor","XY Capacitor"),
              ("Plug Current Fuse","Plug Current Fuse"),("hose set (cold)","hose set (cold)"),
              ("hose set (hot)","hose set (hot)"),("Check Valve","Check Valve"),
-             ("Supply cord","Supply cord"),("Plug","Plug")]
+             ("Supply cord","Supply cord"),("Plug","Plug"),("Electronic Module - Integrated Board","Electronic Module - Integrated Board")]
         
     Part_name = models.CharField(verbose_name="Object / part No.",max_length=100,choices=parts)
     Manufacturer = models.CharField(verbose_name="Manufacturer/ trademark",max_length=150)
@@ -97,7 +97,7 @@ class Component_Request(models.Model):
              ("Varistor","Varistor"),("XY Capacitor","XY Capacitor"),
              ("Plug Current Fuse","Plug Current Fuse"),("hose set (cold)","hose set (cold)"),
              ("hose set (hot)","hose set (hot)"),("Check Valve","Check Valve"),
-             ("Supply cord","Supply cord"),("Plug","Plug")]
+             ("Supply cord","Supply cord"),("Plug","Plug"),("Electronic Module - Integrated Board","Electronic Module - Integrated Board")]
     R_Requester = models.ForeignKey("auth.User",on_delete = models.PROTECT,default = 1,verbose_name='Requester')
     R_Part_name = models.CharField(verbose_name="Object / part No.",max_length=100,choices=R_parts)
     R_Manufacturer = models.CharField(verbose_name="Manufacturer/ trademark",max_length=150)

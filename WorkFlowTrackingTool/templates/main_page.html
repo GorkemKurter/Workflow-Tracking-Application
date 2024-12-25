@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Page Template</title>
+    <title>Main Page</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -83,6 +83,7 @@
         <a href="{% url 'UserAuth:component_requests' %}">Component Requests</a>
         <a href="{% url 'UserAuth:component' %}">Components</a>
         <a href="#" onclick="showTable('tasks')">Tasks</a>
+        <a href="{% url 'UserAuth:accounts' %}">Accounts</a>
     </div>
     <div>
         <form action="{% url 'UserAuth:logout' %}" method="post">

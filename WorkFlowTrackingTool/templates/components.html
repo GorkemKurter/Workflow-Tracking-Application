@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Page Template</title>
+    <title>Main Page</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -121,18 +121,22 @@
         form button:hover {
             background-color: #34495e;
         }
-        .add-button {
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .add-button, .export-button {
             display: inline-block;
             padding: 10px 20px;
-            margin-bottom: 20px;
             background-color: #28a745;
             color: white;
             text-align: center;
-            border-radius: 4px;
+            border-radius: 400px;
             text-decoration: none;
-            margin-left: 0;
         }
-        .add-button:hover {
+        .add-button:hover, .export-button:hover {
             background-color: #218838;
         }
     </style>
@@ -145,6 +149,7 @@
             <a href="{% url 'UserAuth:component_requests' %}">Component Requests</a>
             <a href="#" onclick="loadContent('components')">Components</a>
             <a href="#" onclick="loadContent('tasks')">Tasks</a>
+            <a href="{% url 'UserAuth:accounts' %}">Accounts</a>
         </div>
         <div>
             <form action="{% url 'UserAuth:logout' %}" method="post">
@@ -171,6 +176,7 @@
                 </div>
             </div>
             <a href="{% url 'UserAuth:add_component' %}" class="add-button">Add Component</a>
+            <a href="{% url 'UserAuth:cp_export_csv' %}" class="export-button">Export to Excel</a>
             <table id="componentTable">
                 <tr>
                     <th>Part Name</th>
@@ -182,7 +188,12 @@
                     <th>T Washer Dryer</th>
                     <th>F Washer Dryer</th>
                     <th>N Washer</th>
-                    <th>Last Update</th>
+                    <th>Mark(s) of Conformity</th>
+                    <th>
+                        <a href="?sort_by=Last_Update_Date&order={% if current_order == 'asc' %}desc{% else %}asc{% endif %}">
+                            Last Update
+                        </a>
+                    </th>
                     <th>Certificate Expiry Date</th>
                     <th>Test Results</th>
                 </tr>
@@ -197,6 +208,7 @@
                     <td>{{ request.T_Washer_Dryer_LVD }}</td>
                     <td>{{ request.F_Washer_Dryer_LVD }}</td>
                     <td>{{ request.N_Washer_LVD }}</td>
+                    <td>{{ request.Mark_of_Conformity }}</td>
                     <td>{{ request.Last_Update_Date }}</td>
                     <td>{{ request.Certificate_Expiry_Date }}</td>
                     <td>{{ request.Test_Results_Link }}</td>

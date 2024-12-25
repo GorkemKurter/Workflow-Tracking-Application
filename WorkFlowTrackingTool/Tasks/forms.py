@@ -1,5 +1,5 @@
 from django import forms
-from .models import Task
+from .models import Task, Account
 
 class TaskCreationForm(forms.ModelForm):
     
@@ -15,3 +15,9 @@ class TaskUpdateForm(forms.ModelForm):
         form = Task
         model = Task
         fields = ["Task_Description","Task_status","Task_Asigned_at","Task_Due_Date","Task_Priority"]
+
+class AccountAdminForm(forms.ModelForm):
+    
+    class Meta:
+        model = Account
+        fields = '__all__'

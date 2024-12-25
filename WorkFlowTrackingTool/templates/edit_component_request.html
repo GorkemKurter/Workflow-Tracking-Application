@@ -63,20 +63,37 @@
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Save Changes</button>
-    <button type="reset" onclick="deleteRequest()">Delete Request</button> <!-- Delete butonu -->
+    <button type="reset" onclick="confirmDelete({{ component_request.id }})">Delete</button> <!-- Delete butonu -->
 </form>
 
 <script>
-    function deleteRequest() {
-        if (confirm('Are you sure you want to delete this request?')) {
+    function confirmDelete(componentId) {
+        // Get the determination value from the form field
+        var determination = document.getElementById('id_R_Determination').value;
+        
+        // Confirm deletion
+        if (confirm('Are you sure you want to delete this component request?')) {
+            // Create a form dynamically
             var form = document.createElement('form');
-            form.method = 'post';
+            form.method = 'POST';
             form.action = '{% url "UserAuth:delete_component_request" form.instance.id %}';
-            var csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = 'csrfmiddlewaretoken';
-            csrfToken.value = '{{ csrf_token }}';
-            form.appendChild(csrfToken);
+            
+            // Add CSRF token
+            var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            var csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+            
+            // Add determination as a hidden input
+            var determinationInput = document.createElement('input');
+            determinationInput.type = 'hidden';
+            determinationInput.name = 'determination';
+            determinationInput.value = determination;
+            form.appendChild(determinationInput);
+            
+            // Submit the form
             document.body.appendChild(form);
             form.submit();
         }

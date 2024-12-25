@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Task, SubTask
+from .models import Task, SubTask, Account
 from .forms import TaskCreationForm, TaskUpdateForm
 # Register your models here.
 
@@ -20,7 +20,8 @@ class TaskAdmin(admin.ModelAdmin):
         else:
             kwargs['form'] = self.form
         return super().get_form(request, obj, **kwargs)
-    
 
+@admin.register(Account)
+class AccountAdmin(admin.ModelAdmin):
+    model = Account
     
-        

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Component</title>
+    <title>Add Order</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,10 +52,10 @@
 
 <h2>Add Component</h2>
 <button type="button" onclick="window.history.back();">Go Back</button> <!-- Geri dönüş butonu -->
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Add Component</button>
+    <button type="submit">Add Order</button>
 </form>
 
 </body>

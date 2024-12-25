@@ -1,0 +1,7 @@
+17.12.2024
+**********************
+wiews.py dosyası değişti,
+edit_component_request.html dosyası değişti
+
+18.12.2024
+**********************
