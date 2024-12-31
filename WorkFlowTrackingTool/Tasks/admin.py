@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Task, SubTask, Account
+from .models import Task, SubTask, Account, EMC
 from .forms import TaskCreationForm, TaskUpdateForm
 # Register your models here.
 
@@ -24,4 +24,7 @@ class TaskAdmin(admin.ModelAdmin):
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
     model = Account
-    
+
+@admin.register(EMC)
+class EMCAdmin(admin.ModelAdmin):
+    model = EMC

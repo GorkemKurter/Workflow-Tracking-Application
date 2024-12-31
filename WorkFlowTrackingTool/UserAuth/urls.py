@@ -22,7 +22,15 @@ urlpatterns = [
     path('component/export_to_csv', views.cp_export_csv, name='cp_export_csv'),
     path('account/',views.account, name='accounts'),
     path('account/add_account',views.add_account, name='add_accounts'),
-    path('account/edit_account/<int:id>/',views.edit_account, name='edit_accounts')
+    path('account/edit_account/<int:id>/',views.edit_account, name='edit_accounts'),
+    path('account/delete_account/<int:id>/',views.delete_account, name='delete_accounts'),
+    path('account/download/<int:id>/', views.download_order, name='download_order'),
+    path('media/standards/<str:filename>/', views.serve_file, name='serve_file'),
+    path('EMC/', views.EMC_table, name='EMC_table'),
+    path('EMC/add', views.add_EMC, name='add_EMC'),
+    path('EMC/edit/<int:id>/', views.edit_EMC, name='edit_EMC'),
+    path('EMC/delete/<int:id>/', views.delete_EMC, name='delete_EMC'),
+    path('EMC/download/<int:id>/', views.download_EUT_Description, name='download_EUT_Description')
 ]
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -3,5 +3,9 @@
 wiews.py dosyası değişti,
 edit_component_request.html dosyası değişti
 
-18.12.2024
+30.12.2024
 **********************
+Tüm template dosyaları güncellendi.
+Database dosyası aynı kalmalı , o yüzden "makemigrations/migrate" komutları çalıştırılmalı.
+UserAuth urls.py , views.py dosyaları değişti.
+Tasks kısmında models.py,forms.py dosyaları değişti.

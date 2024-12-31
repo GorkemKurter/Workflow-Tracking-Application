@@ -119,6 +119,14 @@
             width: 100%;
             font-size: 18px;
         }
+        .subtopics {
+            display: none;
+            margin-left: 20px;
+        }
+        .subtopics a {
+            display: block;
+            margin-bottom: 5px;
+        }
         form button:hover {
             background-color: #34495e;
         }
@@ -153,6 +161,13 @@
         <a href="{% url 'UserAuth:component' %}">Components</a>
         <a href="#" onclick="loadContent('tasks')">Tasks</a>
         <a href="{% url 'UserAuth:accounts' %}">Accounts</a>
+        <a href="#" onclick="toggleSubtopics('standards')">Standards</a>
+        <div id="standards" class="subtopics">
+            <a href="{% url 'UserAuth:serve_file' 'iec60335-1{ed6.0.CMV}en 2.pdf' %}" download>60335-1</a>
+            <a href="{% url 'UserAuth:serve_file' 'IEC 60335-2-7.Ed.8 2.pdf' %}" download>60335-2-7</a>
+            <a href="{% url 'UserAuth:serve_file' 'IEC_60335-2-11_Ed. 8 1.pdf' %}" download>60335-2-11</a>
+        </div>
+        <a href="{% url 'UserAuth:EMC_table' %}">EMC</a>
     </div>
     <div>
         <form action="{% url 'UserAuth:logout' %}" method="post">
@@ -196,7 +211,7 @@
                 <td>{{ request.Currency }}</td>
                 <td>{{ request.Status }}</td>
                 <td>{{ request.Comments }}</td>
-                <td>{{ request.Order }}</td>
+                <td><a href="{% url 'UserAuth:download_order' request.id %}">{{ request.Order }}</a></td>
             </tr>
             {% endfor %}
         </table>
@@ -247,6 +262,15 @@
                     }
                 }
             }
+        }
+    }
+
+    function toggleSubtopics(subtopicsId) {
+        var subtopics = document.getElementById(subtopicsId);
+        if (subtopics.style.display === 'none' || subtopics.style.display === '') {
+            subtopics.style.display = 'block';
+        } else {
+            subtopics.style.display = 'none';
         }
     }
 

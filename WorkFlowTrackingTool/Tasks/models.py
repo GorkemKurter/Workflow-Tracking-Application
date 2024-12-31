@@ -1,9 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError
-from datetime import datetime
-import os
-from django.utils.text import slugify
 
 
 class Task(models.Model):
@@ -40,21 +37,6 @@ class SubTask(models.Model):
     def __str__(self):
         return self.Subtask_title
 
-class IECEE_tests(models.Model):
-    Title = models.CharField(max_length=100, verbose_name="Test Konusu")
-    EUT_component = models.CharField(max_length=100, verbose_name="Test Edilecek Komponent/Parça/Makine")
-    Test_type_choices = [('Malzeme','Malzeme'),('Elektriksel','Elektriksel')]
-    Test_type = models.CharField(verbose_name="Test Türü",max_length=30,choices=Test_type_choices)
-    Description = models.TextField(verbose_name="Açıklama")
-    Test_result_choices = [('OK','OK'),('NOK','NOK'),('Kararsız','Kararsız')]
-    Test_result = models.CharField(verbose_name="Test Sonucu",max_length=30,choices=Test_result_choices)
-    Test_link = models.CharField(max_length=300,verbose_name='Test Linki',help_text='Test dosyalarının bulunduğu klasör linki')
-    Comments = models.TextField(verbose_name="Gözlemler/Yorumlar")
-    Test_create_date = models.DateField(auto_now_add=True)
-    Test_update_date = models.DateField(auto_now=True)
-    def __str__(self):
-        return self.Title
-
 class Account(models.Model):
     Topic = models.CharField(max_length=100, verbose_name="Konu")
     Company = models.CharField(max_length=100, verbose_name="Firma")
@@ -67,10 +49,100 @@ class Account(models.Model):
     Currency = models.CharField(max_length=100, verbose_name="Para Birimi")
     Status = models.CharField(max_length=100, verbose_name="Onay Durumu")
     Comments = models.CharField(max_length=200, verbose_name="Açıklama")
-    Order = models.FileField(upload_to='orders/', verbose_name="Teklif")
+    Order = models.FileField(upload_to='orders/', verbose_name="Teklif", null=True, blank=True)
     
     def formatted_month(self):
         return self.Month.strftime('%d.%m.%y')
     
     def __str__(self):
         return self.Topic
+    
+class E_lab(models.Model):
+    
+    Requester = models.ForeignKey("auth.User",on_delete = models.PROTECT,default = 1,verbose_name='Talep Eden',related_name='e_lab_Requester')
+    Requested_to = models.ManyToManyField(User,verbose_name='Atanan',related_name='e_lab_Requested_to')
+    Date = models.DateTimeField(auto_now_add=True,verbose_name="Tarih")
+    Last_Update = models.DateTimeField(auto_now=True,verbose_name="Son Güncelleme")
+    Topic = models.CharField(max_length=100, verbose_name="Konu")
+    Content = models.TextField(verbose_name="İçerik")
+    Status = models.CharField(max_length=100, verbose_name="Görev Durumu")
+    Photo1 = models.ImageField(upload_to='lab/', verbose_name="Fotoğraf", null=True, blank=True)
+    Photo2 = models.ImageField(upload_to='lab/', verbose_name="Fotoğraf", null=True, blank=True)
+    Photo3 = models.ImageField(upload_to='lab/', verbose_name="Fotoğraf", null=True, blank=True)
+    Photo4 = models.ImageField(upload_to='lab/', verbose_name="Fotoğraf", null=True, blank=True)
+    Photo5 = models.ImageField(upload_to='lab/', verbose_name="Fotoğraf", null=True, blank=True)
+    Report = models.FileField(upload_to='lab/', verbose_name="Test Verileri", null=True, blank=True)
+    Status_Choices = [("NotResolved","Tamamlanmadı"),("Ongoing","Devam Ediyor"),("Finished","Tamamlandı"),("Pending","Beklemede"),("Cancelled","İptal Edildi")]
+    Priority_Choices = [("High","Yüksek"),("Normal","Normal"),("Low","Düşük")]
+    Priority = models.CharField(max_length=100, verbose_name="Öncelik",choices=Priority_Choices,default="Normal")
+    Status = models.CharField(max_length=100, verbose_name="Durum",choices=Status_Choices,default="NotResolved")
+
+    def formatted_date(self):
+        return self.Date.strftime('%d.%m.%y')
+    
+    def formatted_last_update(self):
+        return self.Last_Update.strftime('%d.%m.%y')
+
+    def __str__(self):
+        return self.Topic
+
+class EMC(models.Model):
+    Requester = models.ForeignKey("auth.User",on_delete = models.PROTECT,default = 1,verbose_name='Talep Eden',related_name='emc_Requester')
+    Topic = models.CharField(max_length=100,verbose_name="Test")
+    Notes = models.TextField(verbose_name="Notlar",blank=True,null=True)
+    Number = models.CharField(max_length=100,verbose_name="Test Numarası")
+    Machine = models.CharField(max_length=100,verbose_name="Test Makinesi")
+    EUT_Description = models.FileField(upload_to='emc/',verbose_name="EUT File",null=True,blank=True)
+    Delivery_Date = models.DateField(verbose_name="Teslim Tarihi",auto_now_add=True)
+    Update_Date = models.DateField(auto_now=True,verbose_name="Son Güncelleme")
+    Status_Chocies = [("NotResolved","Tamamlanmadı"),("Ongoing","Devam Ediyor"),("Finished","Tamamlandı"),("Pending","Beklemede"),("Cancelled","İptal Edildi")]
+    Status = models.CharField(max_length=100,verbose_name="Durum",choices=Status_Chocies,default="NotResolved")
+    Result_Choices = [("Pass","Geçti"),("Fail","Başarısız"),("Ongoing","Devam Ediyor")]
+    Test_link = models.CharField(verbose_name="Test Linki",blank=True,null=True,max_length=200)
+    Result = models.CharField(max_length=100,verbose_name="Sonuç",choices=Result_Choices)
+
+
+    def formatted_delivery_date(self):
+        return self.Delivery_Date.strftime('%d.%m.%y')
+    
+    def formatted_update_date(self):
+        return self.Update_Date.strftime('%d.%m.%y')
+
+    def __str__(self):
+        return self.Topic
+
+class EMC_Test(models.Model):
+
+    EMC = models.ForeignKey(to=EMC,on_delete = models.CASCADE,verbose_name="EMC Testi")
+    Conducted_Emission = models.CharField(max_length=100,verbose_name="Conducted Emission",null=True,blank=True)
+    Flicker = models.CharField(max_length=100,verbose_name="Flicker",null=True,blank=True)
+    Discharge = models.CharField(max_length=100,verbose_name="Electrostatic Discharge",null=True,blank=True)
+    Harmonic = models.CharField(max_length=100,verbose_name="Harmonic",null=True,blank=True)
+    Burst = models.CharField(max_length=100,verbose_name="Burst",null=True,blank=True)
+    Surge = models.CharField(max_length=100,verbose_name="Surge",null=True,blank=True)
+    Conducted_Disturbance = models.CharField(max_length=100,verbose_name="Conducted Disturbance",null=True,blank=True)
+    Voltage_Dips = models.CharField(max_length=100,verbose_name="Voltage Dips",null=True,blank=True)
+    Disturbance_Power = models.CharField(max_length=100,verbose_name="Disturbance Power",null=True,blank=True)
+    Radiated_Impunity = models.CharField(max_length=100,verbose_name="Radiated Immunity",null=True,blank=True)
+    Discontinious_Disturbance = models.CharField(max_length=100,verbose_name="Discontinious Disturbance",null=True,blank=True)
+
+class EUT_Hardware(models.Model):
+
+    EMC = models.ForeignKey(to=EMC,on_delete = models.CASCADE,verbose_name="EMC Testi")
+    Pump = models.CharField(max_length=100,verbose_name="Pump",null=True,blank=True)
+    Motor = models.CharField(max_length=100,verbose_name="Motor",null=True,blank=True)
+    Fan = models.CharField(max_length=100,verbose_name="Fan",null=True,blank=True)
+    EMI_Filter = models.CharField(max_length=100,verbose_name="EMI Filter",null=True,blank=True)
+    Main_Board = models.CharField(max_length=100,verbose_name="Main Board",null=True,blank=True)
+    Display = models.CharField(max_length=100,verbose_name="Display",null=True,blank=True)
+    Driver_Board = models.CharField(max_length=100,verbose_name="Driver Board",null=True,blank=True)
+    Twinjet = models.BooleanField(verbose_name="Twinjet",null=True,blank=True)
+    Circulation_Pump = models.CharField(max_length=100,verbose_name="Circulation Pump",null=True,blank=True)
+
+class EUT_Software(models.Model):
+
+    EMC = models.ForeignKey(to=EMC,on_delete = models.CASCADE,verbose_name="EMC Testi")
+    Main_Board_Software = models.CharField(max_length=100,verbose_name="Main Board Software",null=True,blank=True)
+    Display_Software = models.CharField(max_length=100,verbose_name="Display Software",null=True,blank=True)
+    Driver_Board_Software = models.CharField(max_length=100,verbose_name="Driver Board Software",null=True,blank=True)
+    MPF = models.CharField(max_length=100,verbose_name="MPF",null=True,blank=True)

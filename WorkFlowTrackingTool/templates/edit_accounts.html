@@ -59,6 +59,11 @@
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
+    {% if form.instance.pk and form.instance.Order %}
+    <div>
+        <a href="{{ form.download_url }}">Download Invoice</a>
+    </div>
+{% endif %}
     <button type="submit">Save Changes</button>
     <button type="reset" onclick="deleteRequest()">Delete Component</button> <!-- Delete butonu -->
 </form>

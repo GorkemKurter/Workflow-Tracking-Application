@@ -6,11 +6,13 @@ from django.contrib.auth import login as alogin,authenticate,logout as dlogout
 from django.contrib.auth.decorators import login_required
 from LVD_Management_System.models import Component_Request,Component
 from LVD_Management_System.forms import Component_RequestAdminForm, ComponentAdminForm
-from Tasks.forms import AccountAdminForm
-from Tasks.models import Account
+from Tasks.forms import AccountAdminForm, EMCAdminForm, EMCTestFormSet, EMCHardwareFormSet, EMCSoftwareFormSet
+from Tasks.models import Account, EMC
 import pandas as pd
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from .utils import auto_mail_sender
+from django.http import FileResponse
+import os
 
 #Register/Login Part
 
@@ -284,7 +286,7 @@ def edit_account(request, id):
     if not request.user.is_superuser:
         return render(request, 'accounts.html')
     if request.method == 'POST':
-        form = AccountAdminForm(request.POST, request.FILE, instance=account)
+        form = AccountAdminForm(request.POST, request.FILES, instance=account)
         if form.is_valid():
             form.save()
             return redirect('UserAuth:accounts')
@@ -299,3 +301,121 @@ def delete_account(request, id):
         account.delete()
         return redirect('UserAuth:accounts')
     return render(request, 'accounts.html', {'form': ComponentAdminForm(instance=account)})
+
+@login_required(login_url='UserAuth:login')
+def download_order(request, id):
+    account = get_object_or_404(Account, id=id)
+    if os.path.exists(account.Order.path):
+        response = FileResponse(account.Order.open(), as_attachment=True, filename=account.Order.name.split('/')[-1])
+        return response
+    else:
+        return HttpResponseNotFound('File not found')
+
+#Standards Part
+
+@login_required(login_url='UserAuth:login')
+def serve_file(request, filename):
+    file_path = os.path.join('media/standards', filename)
+    if os.path.exists(file_path):
+        return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=filename)
+    else:
+        return HttpResponseNotFound('File not found')
+    
+#EMC Part
+
+@login_required(login_url='UserAuth:login')
+def EMC_table(request):
+    sort_by = request.GET.get('sort_by', 'Update_Date')
+    order = request.GET.get('order', 'desc')
+    if order == 'asc':
+        EMC_datas = EMC.objects.all().order_by(sort_by)
+    else:
+        EMC_datas = EMC.objects.all().order_by(f'-{sort_by}')
+    context = {
+        'EMC_datas': EMC_datas,
+        'current_order': order
+    }
+    return render(request,'EMC_records.html', context=context)
+
+@login_required(login_url='UserAuth:login')
+def add_EMC(request):
+    if request.method == 'POST':
+        form = EMCAdminForm(request.POST, request.FILES)
+        formset = EMCTestFormSet(request.POST)
+        formset_hardware = EMCHardwareFormSet(request.POST)
+        formset_software = EMCSoftwareFormSet(request.POST)
+        if form.is_valid() and formset.is_valid():
+            emc = form.save()
+            formset.instance = emc
+            formset_hardware.instance = emc
+            formset_software.instance = emc
+            formset.save()
+            formset_hardware.save()
+            formset_software.save()
+            return redirect('UserAuth:EMC_table')
+    else:
+        form = EMCAdminForm()
+        formset = EMCTestFormSet()
+        formset_hardware = EMCHardwareFormSet()
+        formset_software = EMCSoftwareFormSet()
+    return render(request, 'add_EMC.html', {
+        'form': form,
+        'formset': formset,
+        'formset_hardware': formset_hardware,
+        'formset_software': formset_software
+    })
+
+@login_required(login_url='UserAuth:login')
+def edit_EMC(request, id):
+    EMC_record = get_object_or_404(EMC, id=id)
+    if not request.user.is_superuser:
+        form = EMCAdminForm(instance=EMC_record)
+        formset = EMCTestFormSet(instance=EMC_record)
+        formset_hardware = EMCHardwareFormSet(instance=EMC_record)
+        formset_software = EMCSoftwareFormSet(instance=EMC_record)
+        return render(request, 'view_EMC.html', {'form': form, 
+                                                 'formset': formset, 
+                                                 'formset_hardware': formset_hardware, 
+                                                 'formset_software': formset_software})
+    if request.method == 'POST':
+        form = EMCAdminForm(request.POST, request.FILES, instance=EMC_record)
+        formset = EMCTestFormSet(request.POST, instance=EMC_record)
+        formset_hardware = EMCHardwareFormSet(request.POST, instance=EMC_record)
+        formset_software = EMCSoftwareFormSet(request.POST, instance=EMC_record)
+        if form.is_valid():
+            emc = form.save()
+            formset.instance = emc
+            formset_hardware.instance = emc
+            formset_software.instance = emc
+            formset.save()
+            formset_hardware.save()
+            formset_software.save()
+            return redirect('UserAuth:EMC_table')
+    else:
+        form = EMCAdminForm(instance=EMC_record)
+        formset = EMCTestFormSet(instance=EMC_record)
+        formset_hardware = EMCHardwareFormSet(instance=EMC_record)
+        formset_software = EMCSoftwareFormSet(instance=EMC_record)
+    return render (request, 'edit_EMC.html',
+                    {'form': form,
+                    'formset' : formset,
+                    'formset_hardware' : formset_hardware,
+                    'formset_software' : formset_software,
+                    'editable': True})
+
+@login_required(login_url='UserAuth:login')
+def delete_EMC(request, id):
+    EMC_record = get_object_or_404(EMC, id=id)
+    if request.method == 'POST':
+        EMC_record.delete()
+        return redirect('UserAuth:EMC_table')
+    return render(request, 'EMC_records.html', {'form': EMCAdminForm(instance=EMC_record)})
+
+@login_required(login_url='UserAuth:login')
+def download_EUT_Description(request, id):
+    EMC_datas = get_object_or_404(EMC, id=id)
+    if os.path.exists(EMC_datas.EUT_Description.path):
+        response = FileResponse(EMC_datas.EUT_Description.open(), as_attachment=True, filename=EMC_datas.EUT_Description.name.split('/')[-1])
+        return response
+    else:
+        return HttpResponseNotFound('File not found')

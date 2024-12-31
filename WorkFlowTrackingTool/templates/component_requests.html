@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Page</title>
+    <title>Component Requests</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -118,6 +118,14 @@
             width: 100%;
             font-size: 18px;
         }
+        .subtopics {
+            display: none;
+            margin-left: 20px;
+        }
+        .subtopics a {
+            display: block;
+            margin-bottom: 5px;
+        }
         form button:hover {
             background-color: #34495e;
         }
@@ -150,7 +158,14 @@
             <a href="#" onclick="loadContent('componentRequests')">Component Requests</a>
             <a href="{% url 'UserAuth:component' %}">Components</a>
             <a href="#" onclick="loadContent('tasks')">Tasks</a>
-            <a href="{% url 'UserAuth:component' %}">Accounts</a>
+            <a href="{% url 'UserAuth:accounts' %}">Accounts</a>
+            <a href="#" onclick="toggleSubtopics('standards')">Standards</a>
+            <div id="standards" class="subtopics">
+                <a href="{% url 'UserAuth:serve_file' 'iec60335-1{ed6.0.CMV}en 2.pdf' %}" download>60335-1</a>
+                <a href="{% url 'UserAuth:serve_file' 'IEC 60335-2-7.Ed.8 2.pdf' %}" download>60335-2-7</a>
+                <a href="{% url 'UserAuth:serve_file' 'IEC_60335-2-11_Ed. 8 1.pdf' %}" download>60335-2-11</a>
+            </div>
+            <a href="{% url 'UserAuth:EMC_table' %}">EMC</a>
         </div>
         <div>
             <form action="{% url 'UserAuth:logout' %}" method="post">
@@ -300,10 +315,11 @@
             for (i = 1; i < tr.length; i++) {
                 td = tr[i].getElementsByTagName("td");
                 if (td) {
-                    var washerIndex = filterType === 'T Washer' ? 5 :
-                                      filterType === 'F Washer' ? 6 :
+                    var washerIndex = filterType === 'T Washer' ? 6 :
+                                      filterType === 'F Washer' ? 7 :
                                       filterType === 'T Washer Dryer' ? 7 :
-                                      filterType === 'F Washer Dryer' ? 8 : 9;
+                                      filterType === 'F Washer Dryer' ? 9:
+                                      filterType === 'N Washer' ? 10 : 10;
                     if (td[washerIndex] && td[washerIndex].innerHTML.toLowerCase() === 'true') {
                         tr[i].style.display = "";
                     } else {
@@ -312,6 +328,14 @@
                 }
             }
         }
+        function toggleSubtopics(subtopicsId) {
+        var subtopics = document.getElementById(subtopicsId);
+        if (subtopics.style.display === 'none' || subtopics.style.display === '') {
+            subtopics.style.display = 'block';
+        } else {
+            subtopics.style.display = 'none';
+        }
+    }
     
         document.getElementById("filterInput").addEventListener("keyup", filterTable);
     
