@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError
+from .utils import order_upload_to, emc_upload_to, e_lab_upload_to
 
 
 class Task(models.Model):
@@ -49,7 +50,7 @@ class Account(models.Model):
     Currency = models.CharField(max_length=100, verbose_name="Para Birimi")
     Status = models.CharField(max_length=100, verbose_name="Onay Durumu")
     Comments = models.CharField(max_length=200, verbose_name="Açıklama")
-    Order = models.FileField(upload_to='orders/', verbose_name="Teklif", null=True, blank=True)
+    Order = models.FileField(upload_to=order_upload_to, verbose_name="Teklif", null=True, blank=True)
     
     def formatted_month(self):
         return self.Month.strftime('%d.%m.%y')
@@ -66,12 +67,7 @@ class E_lab(models.Model):
     Topic = models.CharField(max_length=100, verbose_name="Konu")
     Content = models.TextField(verbose_name="İçerik")
     Status = models.CharField(max_length=100, verbose_name="Görev Durumu")
-    Photo1 = models.ImageField(upload_to='lab/', verbose_name="Fotoğraf", null=True, blank=True)
-    Photo2 = models.ImageField(upload_to='lab/', verbose_name="Fotoğraf", null=True, blank=True)
-    Photo3 = models.ImageField(upload_to='lab/', verbose_name="Fotoğraf", null=True, blank=True)
-    Photo4 = models.ImageField(upload_to='lab/', verbose_name="Fotoğraf", null=True, blank=True)
-    Photo5 = models.ImageField(upload_to='lab/', verbose_name="Fotoğraf", null=True, blank=True)
-    Report = models.FileField(upload_to='lab/', verbose_name="Test Verileri", null=True, blank=True)
+    Test_Files = models.FileField(upload_to=e_lab_upload_to, verbose_name="Test Dosyaları", null=True, blank=True)
     Status_Choices = [("NotResolved","Tamamlanmadı"),("Ongoing","Devam Ediyor"),("Finished","Tamamlandı"),("Pending","Beklemede"),("Cancelled","İptal Edildi")]
     Priority_Choices = [("High","Yüksek"),("Normal","Normal"),("Low","Düşük")]
     Priority = models.CharField(max_length=100, verbose_name="Öncelik",choices=Priority_Choices,default="Normal")
@@ -92,7 +88,7 @@ class EMC(models.Model):
     Notes = models.TextField(verbose_name="Notlar",blank=True,null=True)
     Number = models.CharField(max_length=100,verbose_name="Test Numarası")
     Machine = models.CharField(max_length=100,verbose_name="Test Makinesi")
-    EUT_Description = models.FileField(upload_to='emc/',verbose_name="EUT File",null=True,blank=True)
+    EUT_Description = models.FileField(upload_to=emc_upload_to,verbose_name="EUT File",null=True,blank=True)
     Delivery_Date = models.DateField(verbose_name="Teslim Tarihi",auto_now_add=True)
     Update_Date = models.DateField(auto_now=True,verbose_name="Son Güncelleme")
     Status_Chocies = [("NotResolved","Tamamlanmadı"),("Ongoing","Devam Ediyor"),("Finished","Tamamlandı"),("Pending","Beklemede"),("Cancelled","İptal Edildi")]

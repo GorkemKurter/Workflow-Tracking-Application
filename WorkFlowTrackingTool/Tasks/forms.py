@@ -2,6 +2,7 @@ from django import forms
 from django.forms import inlineformset_factory
 from .models import Task, Account, E_lab, EMC, EMC_Test ,EUT_Hardware, EUT_Software
 from django.urls import reverse
+from multiupload.fields import MultiFileField
 
 class TaskCreationForm(forms.ModelForm):
     
@@ -44,6 +45,8 @@ class AccountAdminForm(forms.ModelForm):
         return account
 
 class E_labAdminForm(forms.ModelForm):
+
+    Test_Files = MultiFileField(min_num=1, max_num=10, max_file_size=1024*1024*30, required=False, label='Test Dosyaları')
 
     class Meta :
         model = E_lab

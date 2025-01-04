@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import Task, SubTask, Account, EMC
-from .forms import TaskCreationForm, TaskUpdateForm
+from .models import Task, SubTask, Account, EMC, E_lab
+from .forms import TaskCreationForm, TaskUpdateForm, E_labAdminForm
 # Register your models here.
 
 class SubtaskInLine(admin.TabularInline):
@@ -28,3 +28,8 @@ class AccountAdmin(admin.ModelAdmin):
 @admin.register(EMC)
 class EMCAdmin(admin.ModelAdmin):
     model = EMC
+
+@admin.register(E_lab)
+class E_labAdmin(admin.ModelAdmin):
+    model = E_lab
+    form = E_labAdminForm

@@ -1,4 +1,6 @@
 import requests
+from django.utils.text import slugify
+import os
 
 def send_telegram_message(message):
     bot_token = '7778529175:AAG07DGCZSP-uVqn4vQILVqC7N7xH_lj2fU'
@@ -18,4 +20,16 @@ def send_telegram_message(message):
         print(f"An error occurred: {e}")
         
 #send_telegram_message('Port Number Test')
+
+def order_upload_to(instance, filename):
+    topic_slug = slugify(instance.Topic)
+    return os.path.join(f'orders/{topic_slug}', filename)
+
+def emc_upload_to(instance, filename):
+    emc_slug = slugify(instance.Topic)
+    return os.path.join(f'emc/{emc_slug}', filename)
+
+def e_lab_upload_to(instance, filename):
+    e_lab_slug = slugify(instance.Topic)
+    return os.path.join(f'Tests/{e_lab_slug}', filename)
 
