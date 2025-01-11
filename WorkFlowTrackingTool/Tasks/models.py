@@ -61,17 +61,18 @@ class Account(models.Model):
 class E_lab(models.Model):
     
     Requester = models.ForeignKey("auth.User",on_delete = models.PROTECT,default = 1,verbose_name='Talep Eden',related_name='e_lab_Requester')
-    Requested_to = models.ManyToManyField(User,verbose_name='Atanan',related_name='e_lab_Requested_to')
+    Requested_to = models.ForeignKey("auth.User",verbose_name='Atanan',related_name='e_lab_Requested_to',on_delete = models.PROTECT,default=1)
     Date = models.DateTimeField(auto_now_add=True,verbose_name="Tarih")
     Last_Update = models.DateTimeField(auto_now=True,verbose_name="Son Güncelleme")
     Topic = models.CharField(max_length=100, verbose_name="Konu")
-    Content = models.TextField(verbose_name="İçerik")
-    Status = models.CharField(max_length=100, verbose_name="Görev Durumu")
-    Test_Files = models.FileField(upload_to=e_lab_upload_to, verbose_name="Test Dosyaları", null=True, blank=True)
-    Status_Choices = [("NotResolved","Tamamlanmadı"),("Ongoing","Devam Ediyor"),("Finished","Tamamlandı"),("Pending","Beklemede"),("Cancelled","İptal Edildi")]
-    Priority_Choices = [("High","Yüksek"),("Normal","Normal"),("Low","Düşük")]
+    Content = models.TextField(verbose_name="İçerik/Yorumlar")
+    Status_Choices = [("Tamamlanmadı","Tamamlanmadı"),("Devam Ediyor","Devam Ediyor"),("Tamamlandı","Tamamlandı"),("Beklemede","Beklemede"),("İptal Edildi","İptal Edildi")]
+    Priority_Choices = [("Yüksek","Yüksek"),("Normal","Normal"),("Düşük","Düşük")]
+    Result_Choices = [("Geçti","Geçti"),("Başarısız","Başarısız"),("Devam Ediyor","Devam Ediyor")]
     Priority = models.CharField(max_length=100, verbose_name="Öncelik",choices=Priority_Choices,default="Normal")
-    Status = models.CharField(max_length=100, verbose_name="Durum",choices=Status_Choices,default="NotResolved")
+    Status = models.CharField(max_length=100, verbose_name="Durum",choices=Status_Choices,default="Tamamlanmadı")
+    Result = models.CharField(max_length=100, verbose_name="Sonuç",choices=Result_Choices,default="Devam Ediyor")
+    Test_Files = models.FileField(upload_to=e_lab_upload_to, verbose_name="Test Dosyaları", null=True, blank=True)
 
     def formatted_date(self):
         return self.Date.strftime('%d.%m.%y')
@@ -88,7 +89,6 @@ class EMC(models.Model):
     Notes = models.TextField(verbose_name="Notlar",blank=True,null=True)
     Number = models.CharField(max_length=100,verbose_name="Test Numarası")
     Machine = models.CharField(max_length=100,verbose_name="Test Makinesi")
-    EUT_Description = models.FileField(upload_to=emc_upload_to,verbose_name="EUT File",null=True,blank=True)
     Delivery_Date = models.DateField(verbose_name="Teslim Tarihi",auto_now_add=True)
     Update_Date = models.DateField(auto_now=True,verbose_name="Son Güncelleme")
     Status_Chocies = [("NotResolved","Tamamlanmadı"),("Ongoing","Devam Ediyor"),("Finished","Tamamlandı"),("Pending","Beklemede"),("Cancelled","İptal Edildi")]
@@ -96,6 +96,7 @@ class EMC(models.Model):
     Result_Choices = [("Pass","Geçti"),("Fail","Başarısız"),("Ongoing","Devam Ediyor")]
     Test_link = models.CharField(verbose_name="Test Linki",blank=True,null=True,max_length=200)
     Result = models.CharField(max_length=100,verbose_name="Sonuç",choices=Result_Choices)
+    EUT_Description = models.FileField(upload_to=emc_upload_to,verbose_name="EUT File",null=True,blank=True)
 
 
     def formatted_delivery_date(self):

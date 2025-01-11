@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMC Tests</title>
+    <title>Laboratory Tests</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -165,8 +165,8 @@
                 <a href="{% url 'UserAuth:serve_file' 'IEC 60335-2-7.Ed.8 2.pdf' %}" download>60335-2-7</a>
                 <a href="{% url 'UserAuth:serve_file' 'IEC_60335-2-11_Ed. 8 1.pdf' %}" download>60335-2-11</a>
             </div>
-            <a href="#" onclick="showTable('EMC')">EMC</a>
-            <a href="{% url 'UserAuth:view_e_lab' %}">E-Lab</a>
+            <a href="{% url 'UserAuth:EMC_table' %}">EMC</a>
+            <a href="#" onclick="showTable('TestTable')">E-Lab</a>
         </div>
         <div>
             <form action="{% url 'UserAuth:logout' %}" method="post">
@@ -176,41 +176,41 @@
         </div>
     </div>    
     <div class="main-content" id="main-content">
-        <div id="EMCTable" class="table-container">
-            <h2>EMC Tests</h2>
+        <div id="TestTable" class="table-container">
+            <h2>Laboratory Tests</h2>
             <div class="filter-container">
                 <input type="text" id="filterInput" placeholder="Search..." onkeyup="filterTable()">
                 <button type="button" onclick="clearFilter()">Clear Filter</button>
             </div>
-            <a href="{% url 'UserAuth:add_EMC' %}" class="add-button">Add EMC Record</a>
-            <a href="{% url 'UserAuth:cp_export_csv' %}" class="export-button">Export to Excel</a>
-            <table id="EMCTable">
+            <a href="{% url 'UserAuth:add_EMC' %}" class="add-button">Yeni Test Ekle</a>
+            <a href="{% url 'UserAuth:cp_export_csv' %}" class="export-button">Verileri Excel'e aktar</a>
+            <table id="TestTable">
                 <tr>
-                    <th>Requester</th>
-                    <th>Topic</th>
-                    <th>Jira Number</th>
-                    <th>Machine</th>
+                    <th>Başlık</th>
+                    <th>Oluşturan</th>
+                    <th>Test Sorumlusu</th>
+                    <th>Öncelik</th>
                     <th>
-                        <a href="?sort_by=Delivery_Date&order={% if current_order == 'asc' %}desc{% else %}asc{% endif %}">
-                            Delivery Date
+                        <a href="?sort_by=Date&order={% if current_order == 'asc' %}desc{% else %}asc{% endif %}">
+                            Atanma Tarihi
                         </a>
                     </th>
                     <th>
-                        <a href="?sort_by=Update_Date&order={% if current_order == 'asc' %}desc{% else %}asc{% endif %}">
-                            Last Update
+                        <a href="?sort_by=Last_Update&order={% if current_order == 'asc' %}desc{% else %}asc{% endif %}">
+                            Son Güncelleme Tarihi
                         </a>
                     </th>
-                    <th>Status</th>
-                    <th>Result</th>
+                    <th>Son Durum</th>
+                    <th>Sonuç</th>
                 </tr>
-                {% for request in EMC_datas %}
+                {% for request in Test_datas %}
                 <tr>
+                    <td><a href="{% url 'UserAuth:edit_Test' request.id %}">{{ request.Topic}}</a></td>
                     <td>{{ request.Requester }}</td>
-                    <td><a href="{% url 'UserAuth:edit_EMC' request.id %}">{{ request.Topic}}</a></td>
-                    <td>{{ request.Number }}</td>
-                    <td>{{ request.Machine }}</td>
-                    <td>{{ request.Delivery_Date }}</td>
-                    <td>{{ request.Update_Date }}</td>
+                    <td>{{ request.Requested_to }}</td>
+                    <td>{{ request.Priority }}</td>
+                    <td>{{ request.Date }}</td>
+                    <td>{{ request.Last_Update }}</td>
                     <td>{{ request.Status }}</td>
                     <td>{{ request.Result }}</td>
                 </tr>
@@ -249,7 +249,7 @@
             var input, filter, table, tr, td, i, j;
             input = document.getElementById("filterInput");
             filter = input.value.toLowerCase();
-            table = document.getElementById("EMCTable");
+            table = document.getElementById("TestTable");
             tr = table.getElementsByTagName("tr");
     
             for (i = 1; i < tr.length; i++) {
@@ -276,7 +276,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            showTable('EMCTable');
+            showTable('TestTable');
         });
     </script>
     

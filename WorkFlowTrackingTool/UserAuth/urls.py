@@ -30,7 +30,10 @@ urlpatterns = [
     path('EMC/add', views.add_EMC, name='add_EMC'),
     path('EMC/edit/<int:id>/', views.edit_EMC, name='edit_EMC'),
     path('EMC/delete/<int:id>/', views.delete_EMC, name='delete_EMC'),
-    path('EMC/download/<int:id>/', views.download_EUT_Description, name='download_EUT_Description')
+    path('EMC/download/<int:id>/', views.download_EUT_Description, name='download_EUT_Description'),
+    path('E_Lab/', views.view_e_lab, name='view_e_lab'),
+    path('E_Lab/edit/<int:id>/', views.edit_Test, name='edit_Test'),
+    path('E_Lab/download/<int:id>/', views.download_Test_File, name='download_Test_File'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

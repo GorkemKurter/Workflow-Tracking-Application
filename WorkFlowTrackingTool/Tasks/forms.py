@@ -2,7 +2,6 @@ from django import forms
 from django.forms import inlineformset_factory
 from .models import Task, Account, E_lab, EMC, EMC_Test ,EUT_Hardware, EUT_Software
 from django.urls import reverse
-from multiupload.fields import MultiFileField
 
 class TaskCreationForm(forms.ModelForm):
     
@@ -45,14 +44,32 @@ class AccountAdminForm(forms.ModelForm):
         return account
 
 class E_labAdminForm(forms.ModelForm):
-
-    Test_Files = MultiFileField(min_num=1, max_num=10, max_file_size=1024*1024*30, required=False, label='Test Dosyaları')
+    remove_Test_Files = forms.BooleanField(required=False, label='Mevcut test dosyasını kaldır')
 
     class Meta :
         model = E_lab
+        widgets = {
+            'Test_Files': forms.FileInput(),
+        }
         fields = '__all__'
+    def __init__(self, *args, **kwargs):
+        super(E_labAdminForm, self).__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            if self.instance.Test_Files:
+                self.download_url = reverse('UserAuth:download_Test_File', args=[self.instance.pk])
+                
+    def save(self, commit=True):
+        Record = super(E_labAdminForm, self).save(commit=False)
+        if self.cleaned_data.get('remove_Test_Files'):
+            Record.Test_Files.delete()
+            Record.Test_Files = None
+        if commit:
+            Record.save()
+        return Record
+
 
 class EMCAdminForm(forms.ModelForm):
+    
 
     class Meta :
         model = EMC
@@ -66,6 +83,16 @@ class EMCAdminForm(forms.ModelForm):
             if self.instance.EUT_Description:
                 self.download_url = reverse('UserAuth:download_EUT_Description', args=[self.instance.pk])
 
+    remove_EUT_Files = forms.BooleanField(required=False, label='Remove current EUT Description')
+    
+    def save(self, commit=True):
+        Record = super(EMCAdminForm, self).save(commit=False)
+        if self.cleaned_data.get('remove_EUT_Files'):
+            Record.EUT_Description.delete()
+            Record.EUT_Description = None
+        if commit:
+            Record.save()
+        return Record
 
 class EMC_TestAdminForm(forms.ModelForm):
 

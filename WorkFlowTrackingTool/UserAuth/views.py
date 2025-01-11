@@ -6,8 +6,8 @@ from django.contrib.auth import login as alogin,authenticate,logout as dlogout
 from django.contrib.auth.decorators import login_required
 from LVD_Management_System.models import Component_Request,Component
 from LVD_Management_System.forms import Component_RequestAdminForm, ComponentAdminForm
-from Tasks.forms import AccountAdminForm, EMCAdminForm, EMCTestFormSet, EMCHardwareFormSet, EMCSoftwareFormSet
-from Tasks.models import Account, EMC
+from Tasks.forms import AccountAdminForm, EMCAdminForm, EMCTestFormSet, EMCHardwareFormSet, EMCSoftwareFormSet, E_labAdminForm
+from Tasks.models import Account, EMC, E_lab
 import pandas as pd
 from django.http import HttpResponse, HttpResponseNotFound
 from .utils import auto_mail_sender
@@ -416,6 +416,54 @@ def download_EUT_Description(request, id):
     EMC_datas = get_object_or_404(EMC, id=id)
     if os.path.exists(EMC_datas.EUT_Description.path):
         response = FileResponse(EMC_datas.EUT_Description.open(), as_attachment=True, filename=EMC_datas.EUT_Description.name.split('/')[-1])
+        return response
+    else:
+        return HttpResponseNotFound('File not found')
+    
+#E-Lab Part
+
+@login_required(login_url='UserAuth:login')
+def view_e_lab(request):
+    sort_by = request.GET.get('sort_by', 'Last_Update')
+    order = request.GET.get('order', 'desc')
+    if order == 'asc':
+        Test_datas = E_lab.objects.all().order_by(sort_by)
+    else:
+        Test_datas = E_lab.objects.all().order_by(f'-{sort_by}')
+    context = {
+        'Test_datas': Test_datas,
+        'current_order': order
+    }
+    return render(request,'Test_records.html', context=context)
+
+@login_required(login_url='UserAuth:login')
+def edit_Test(request, id):
+    Test_datas = get_object_or_404(E_lab, id=id)
+    if not (request.user.is_superuser or request.user == Test_datas.Requester or request.user == Test_datas.Requested_to):
+        form = E_labAdminForm(instance=Test_datas)
+        return render(request, 'view_Test.html', {'form': form})
+    if request.method == 'POST':
+        form = E_labAdminForm(request.POST, request.FILES, instance=Test_datas)
+        if form.is_valid():
+            form.save()
+            return redirect('UserAuth:view_e_lab')
+    else: 
+        form = E_labAdminForm(instance=Test_datas)
+    return render(request, 'edit_Test.html', {'form': form, 'editable': True})
+
+@login_required(login_url='UserAuth:login')
+def delete_EMC(request, id):
+    Test_Datas = get_object_or_404(E_lab, id=id)
+    if request.method == 'POST':
+        Test_Datas.delete()
+        return redirect('UserAuth:view_e_lab')
+    return render(request, 'Test_records.html', {'form': E_labAdminForm(instance=Test_Datas)})
+
+@login_required(login_url='UserAuth:login')
+def download_Test_File(request, id):
+    Test_datas = get_object_or_404(E_lab, id=id)
+    if os.path.exists(Test_datas.Test_Files.path):
+        response = FileResponse(Test_datas.Test_Files.open(), as_attachment=True, filename=Test_datas.Test_Files.name.split('/')[-1])
         return response
     else:
         return HttpResponseNotFound('File not found')
